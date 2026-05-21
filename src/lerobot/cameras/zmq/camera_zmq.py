@@ -250,6 +250,7 @@ class ZMQCamera(Camera):
         if stop_event is None:
             raise RuntimeError(f"{self}: stop_event is not initialized.")
 
+        stop_event = self.stop_event
         failure_count = 0
         while not stop_event.is_set():
             try:
@@ -293,6 +294,8 @@ class ZMQCamera(Camera):
 
         if self.thread is not None and self.thread.is_alive():
             self.thread.join(timeout=2.0)
+            if self.thread.is_alive():
+                logger.warning(f"{self} read thread did not terminate within timeout.")
 
         self.thread = None
         self.stop_event = None
